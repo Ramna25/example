@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     stages {
-        stage('Check for Changes') {
+        stage('Check for Change') {
             when {
                 expression { return env.BRANCH_NAME == 'feature' || env.BRANCH_NAME == 'master' || env.BRANCH_NAME == 'third' }
             }
