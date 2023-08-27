@@ -8,7 +8,7 @@ pipeline {
                     // Define a list of repositories and their branches to monitor
                     def repositories = [
                         [url: 'https://github.com/Ramna25/example.git', branch: 'main'],
-                        [url: 'https://github.com/user/repo2.git', branch: 'feature']
+                        [url: 'https://github.com/Ramna25/RestAssured-Workshop.git', branch: 'feature']
                     ]
                     
                     for (repo in repositories) {
