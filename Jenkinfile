@@ -2,28 +2,37 @@ pipeline {
     agent any
 
     stages {
-        stage('Check for Change') {
-            when {
-                expression { return env.BRANCH_NAME == 'feature' || env.BRANCH_NAME == 'master' || env.BRANCH_NAME == 'third' }
-            }
+        stage('Monitor Other Repositories') {
             steps {
                 script {
-                    def hasChanges = false
-                    try {
-                        // Check if there are any changes in the current branch
-                        hasChanges = sh(returnStatus: true, script: 'git diff --quiet HEAD~ HEAD')
-                    } catch (Exception ex) {
-                        currentBuild.result = 'FAILURE'
-                        error "Failed to check for changes: ${ex}"
-                    }
+                    // Define a list of repositories and their branches to monitor
+                    def repositories = [
+                        [url: 'https://github.com/Ramna25/example.git', branch: 'main'],
+                        [url: 'https://github.com/user/repo2.git', branch: 'feature']
+                    ]
+                    
+                    for (repo in repositories) {
+                        def repoUrl = repo.url
+                        def repoBranch = repo.branch
 
-                    if (hasChanges) {
-                        echo "Changes detected in ${env.BRANCH_NAME}"
-                    } else {
-                        echo "No changes detected in ${env.BRANCH_NAME}"
+                        // Clone the repository and check for changes in the specified branch
+                        try {
+                            sh "git clone ${repoUrl} temp-repo"
+                            sh "cd temp-repo && git checkout ${repoBranch} && git pull"
+                            def hasChanges = sh(script: 'cd temp-repo && git diff --quiet HEAD~ HEAD', returnStatus: true)
+                            
+                            if (hasChanges == 0) {
+                                echo "Changes detected in branch ${repoBranch} of repository ${repoUrl}"
+                                // Trigger additional actions or jobs as needed
+                            } else {
+                                echo "No changes detected in branch ${repoBranch} of repository ${repoUrl}"
+                            }
+                        } catch (Exception ex) {
+                            echo "Error checking repository: ${ex}"
+                        } finally {
+                            sh "rm -rf temp-repo"
+                        }
                     }
                 }
             }
         }
-    }
-}
