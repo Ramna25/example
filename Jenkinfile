@@ -52,7 +52,7 @@ pipeline {
           }  
           }
 
-        stage('Move into the cloned directory'){
+       // stage('Move into the cloned directory'){
           steps
           {
             sh '''
@@ -63,7 +63,7 @@ pipeline {
           }
         
     }
-        stage('Delete cloned directory'){
+      //  stage('Delete cloned directory'){
           steps
           {
             sh '''
